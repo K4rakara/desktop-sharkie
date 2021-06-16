@@ -1,0 +1,20 @@
+[package]
+name = "desktop-sharkie"
+version = "0.1.0"
+edition = "2018"
+build = "src/build.rs"
+
+[dependencies]
+crossbeam-channel = { version = "0.5" }
+failure = { version = "0.1" }
+glium = { git = "https://github.com/K4rakara/glium.git", branch = "desktop-sharkie" }
+image = { version = "0.23" }
+raw-window-handle = { version = "0.3" }
+rayon = { version = "1.5" }
+
+[target.'cfg(target_family = "windows")'.dependencies]
+winapi = { version = "0.3" }
+
+[target.'cfg(target_family = "windows")'.build-dependencies]
+winres = { version = "0.1" }
+
