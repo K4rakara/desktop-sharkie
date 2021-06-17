@@ -1,3 +1,6 @@
+// This is a GPU shader. GPU shaders are really hard to explain, I won't go
+// into detail about how they work here.
+
 #version 100
 
 uniform lowp sampler2D tex;

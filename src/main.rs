@@ -28,10 +28,19 @@ use measurements::Measurements;
 use misc::{ fatal, UserEvent };
 
 fn main() -> Result<(), Error> {
+    // Create the event loop. This is what takes in events like keypresses and
+    // clicks from the operating system.
     let event_loop = EventLoop::<UserEvent>::with_user_event();
     
+    // Take some measurements of the screen(s), so we know how to correctly
+    // scale the window. This gets passed the event loop because the event loop
+    // has a function that lets you check the size and position of connected
+    // monitors.
     let mut measurements = Measurements::new(&event_loop);
 
+    // Create a "display". A display is an abstraction provided by the glium
+    // crate that lets us easily render to an OpenGL canvas without all the
+    // headaches associated with it.
     let display = {
         let window_builder = WindowBuilder::new()
             .with_title("a")
@@ -54,12 +63,17 @@ fn main() -> Result<(), Error> {
             &event_loop)?
     };
 
+    // Move the window to where it should be.
     display.gl_window().window().set_outer_position(PhysicalPosition {
         x: measurements.shark_pos.0,
         y: measurements.shark_pos.1,
     });
     
-    #[cfg(platform_windows)] {
+    // If you're on windows, theres a few more steps to do. Namely, hide the
+    // icon for the window in the taskbar and to make it so you can click the 
+    // windows behind this window when you click it. Additionally, we set up a 
+    // system tray menu that lets the user close the app easily.
+    #[cfg(platform_windows)] { 
         platform::windows::configure_window(&display);
         platform::windows::configure_tray();
     }
@@ -104,8 +118,16 @@ fn main() -> Result<(), Error> {
             fragment: include_str!("fragment.100.glsl"),
         })?;
     
+    // This stores whether or not the frames are done loading.
+    //
+    // Arc<AtomicBool> allows us to create multiple references to the same
+    // value that all update when one of them is changed.
     let ready = Arc::new(AtomicBool::new(false));
 
+    // Create a handle to the loaded frames. Note that they're not actually
+    // loaded yet, but this Frames type blocks until the next frame has fully
+    // loaded when a frame is requested.
+    // Display is passed so that it can resize the images to fit the window.
     let mut frames = Frames::new(&display, ready.clone());
  
     let mut go_right = true;
@@ -117,6 +139,7 @@ fn main() -> Result<(), Error> {
     // if this is an even frame when repainting the window.
     #[allow(unused_mut)] let mut frame_count: usize = 0;
     
+    // Start up a thread that moves the window periodically.
     {
         let event_loop_proxy = event_loop.create_proxy();
         let ready = ready.clone();
