@@ -28,3 +28,20 @@ optimizations to code, which makes it crazy lightweight and fast.
 
 Just grab the file in `target/release/desktop-sharkie.exe`, and you're done!
 
+### Compiling from Source (Linux)
+
+First, install the `rustup` package with your package manager.
+
+Then, open a terminal in this directory and run `cargo build --release`.
+
+> Note: Linux is currently buggy. Even though its my daily driver, I wanted to
+> get this out for the larger majority of users first, since I made it for
+> Guras birthday.
+> I'll be improving support for it in the coming weeks.
+
+### Compiling from Source (MacOS)
+
+I don't have any means of testing for MacOS, but I would assume its a similar
+process to Linux, thanks to good ol' POSIX. If anybody has a Mac and would like
+to contribute, I would be very appreciative.
+
