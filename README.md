@@ -45,3 +45,17 @@ I don't have any means of testing for MacOS, but I would assume its a similar
 process to Linux, thanks to good ol' POSIX. If anybody has a Mac and would like
 to contribute, I would be very appreciative.
 
+## List of Known Bugs
+
+Check back periodically to see if any of these issues have been fixed!
+
+ - Windows
+   - System tray icon sometimes (seemingly at random?) is invisible (can still
+     be interacted with, but the icon is missing).
+   - System tray menu doesn't close automatically like other right click menus.
+ - Linux
+   - Window is opaque.
+   - Taskbar height calculation is inaccurate.
+   - Fatal errors are logged to stderr, with no visual indicator.
+   - ... Many more
+
