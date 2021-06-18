@@ -15,22 +15,11 @@ fn main() {
                     is problematic. If you run into any issues, please try \
                     building in a windows VM.");
         
-        println!("cargo:warning=Hi");
-
         // Set the cfg flag.
         println!("cargo:rustc-cfg=platform_windows");
         
         // Add windows resources.
-        // This is the stuff that is shown when you right click an executable
-        // and hit properties (iirc).
-        let mut res = winres::WindowsResource::new();
-        res.set_icon("src/assets/icon.ico")
-            .set("ProductName", "Desktop Sharkie")
-            .set("FileDescription", "Desktop Sharkie")
-            .set("LegalCopyright", "Copyleft © 2021")
-            .set("OriginalFilename", "desktop-sharkie.exe")
-            .compile()
-            .unwrap();
+        embed_resource::compile("src/resource.rc");
     } else if env("CARGO_CFG_TARGET_OS") == "macos" {
         // Set the cfg flag.
         println!("cargo:rustc-cfg=platform_macos");
