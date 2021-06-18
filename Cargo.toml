@@ -12,9 +12,9 @@ image = { version = "0.23" }
 raw-window-handle = { version = "0.3" }
 rayon = { version = "1.5" }
 
+[build-dependencies]
+winres = { version = "0.1" }
+
 [target.'cfg(target_family = "windows")'.dependencies]
 winapi = { version = "0.3" }
-
-[target.'cfg(target_family = "windows")'.build-dependencies]
-winres = { version = "0.1" }
 
