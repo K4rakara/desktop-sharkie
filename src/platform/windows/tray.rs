@@ -11,16 +11,13 @@ use winapi::shared::windef::*;
 use winapi::um::libloaderapi::*;
 use misc::fatal;
 
-static mut MENU_OPEN: bool = false;
-
 struct Tray;
 
 impl Tray {
     const INTERACTION: UINT = WM_APP + 1;
 
     const BUTTON_ABOUT: UINT = WM_APP + 2;
-    const BUTTON_CLOSE_MENU: UINT = WM_APP + 3;
-    const BUTTON_CLOSE_GURA: UINT = WM_APP + 4;
+    const BUTTON_CLOSE_GURA: UINT = WM_APP + 3;
 
     unsafe fn hinstance() -> HINSTANCE {
         GetModuleHandleA(null_mut())
@@ -48,15 +45,22 @@ impl Tray {
             "dummy\0".as_ptr() as *mut i8,
             0,
             0, 0,
-            10, 10,
+            0, 0,
             null_mut() as _,
             null_mut() as _,
-            tm(hinstance),
+            std::mem::transmute(hinstance),
             null_mut() as _);
 
         if hwnd.is_null() {
             fatal("Unexpected runtime error.", "Failed to create a dummy window.");
         }
+
+        ShowWindow(hwnd, SW_HIDE);
+        SetWindowLongPtrA(hwnd, GWL_STYLE, 0);
+        SetWindowLongPtrA(
+            hwnd,
+            GWL_EXSTYLE,
+            (WS_EX_TOOLWINDOW & !WS_EX_APPWINDOW) as isize);
 
         hwnd
     }
@@ -129,10 +133,6 @@ impl Tray {
                 Tray::BUTTON_ABOUT => {
                     todo!();
                 },
-                Tray::BUTTON_CLOSE_MENU => {
-                    MENU_OPEN = false;
-                    SetFocus(null_mut());
-                },
                 Tray::BUTTON_CLOSE_GURA => {
                     SendMessageA(hwnd, WM_CLOSE, 0, 0);
                 },
@@ -140,10 +140,11 @@ impl Tray {
             },
             Tray::INTERACTION => match lparam as UINT {
                 WM_RBUTTONUP => {
-                    if MENU_OPEN {
-                        return (&0 as *const i32) as LRESULT;
-                    }
+                    ShowWindow(hwnd, SW_SHOW);
 
+                    SetForegroundWindow(hwnd);
+                    SetFocus(hwnd);
+                    
                     let hmenu = {
                         let hmenu = CreatePopupMenu();
                         /*InsertMenuA(
@@ -156,18 +157,10 @@ impl Tray {
                             hmenu,
                             1,
                             MF_BYPOSITION | MF_STRING,
-                            Tray::BUTTON_CLOSE_MENU as usize,
-                            "Close this menu\0".as_ptr() as *mut i8);
-                        InsertMenuA(
-                            hmenu,
-                            2,
-                            MF_BYPOSITION | MF_STRING,
                             Tray::BUTTON_CLOSE_GURA as usize,
                             "Close Goomba Roomba\0".as_ptr() as *mut i8);
                         hmenu
                     };
-
-                    MENU_OPEN = true;
 
                     let cursor_pos = {
                         let mut cursor_pos: POINT = zeroed();
@@ -185,6 +178,8 @@ impl Tray {
                         null_mut());
 
                     DestroyMenu(hmenu);
+
+                    ShowWindow(hwnd, SW_HIDE);
                 },
                 _ => (),
             },
